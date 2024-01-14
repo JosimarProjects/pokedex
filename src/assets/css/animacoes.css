@@ -1,0 +1,145 @@
+/*fade*/
+.fade-enter-active {
+    transition: opacity 2s;
+}
+
+.fade-enter-to, .fade-leave-from {
+    opacity: 1;
+}
+
+
+.fade-enter-from, .fade-leave-to {
+    opacity: 0;
+}
+
+.fade-leave-active {
+    transition: opacity 3s;
+}
+
+/*slide*/
+.slide-enter-from {
+    opacity: 0;
+    transform: translateX(-150px);
+
+}
+
+.slide-enter-active, .slide-leave-active {
+    transition: all 1s;
+}
+
+.slide-enter-to, .slide-leave-from {
+    opacity: 1;
+    transform: translateX(0px);
+}
+
+.slide-leave-to {
+    opacity: 1;
+    transform: translateX(150px);
+}
+/* zoom */
+.zoom-enter-from {
+   transform: scale(0);
+}
+
+.zoom-enter-active{
+    transition: transform 1s;
+
+}
+
+.zoom-enter-to {
+    transform: scale(1);
+}
+
+.zoom-leave-from {
+    transform: scale(1);
+}
+
+.zoom-leave-active {
+    transition: transform 1s;
+}
+
+.zoom-leave-to {
+    transform: scale(0);
+}
+
+
+/* flip */
+
+.flip-enter-active{
+    animation: flipCustomizado 1s;
+}
+
+.flip-leave-active {
+    animation: flipCustomizado 1s reverse;
+}
+
+@keyframes flip {
+    from {
+        transform: rotateY(-80deg);
+    }
+    to {
+        transform: rotateY(0deg);
+    }
+}
+
+/*@keyframes flipSaida {
+    from {
+        transform: rotateY(0deg);
+    }
+    to {
+        transform: rotateY(80deg);
+    }
+}*/
+
+@keyframes flipCustomizado {
+    0% {
+        transform: rotateY(-80deg);
+    }
+    25% {
+        transform: rotateY(-75deg);
+    }
+    50% {
+        transform: rotateY(-50deg);
+    }
+    75% {
+        transform: rotateY(-25deg);
+    }
+    100% {
+        transform: rotateY(0deg);
+    }
+}
+
+/*Combinando transition e animation*/
+/*pulo*/
+
+.pulo-enter-from {
+    opacity: 0;
+}
+
+.pulo-enter-active {
+    animation: pulo 2s;
+    transition: opacity 6s;
+}
+.pulo-enter-to,  .pulo-leave-from {
+    opacity: 1;
+}
+
+.pulo-leave-active {
+   transition: opacity 1s;
+    animation: pulo 1s;
+}
+.pulo-leave-to {
+    opacity: 0;
+}
+
+@keyframes pulo {
+    0%{ transform: scale(1,1) translateY(0px); }
+    10%{ transform: scale(1.1,.9) translateY(0px); }
+    30%{ transform: scale(.9,1.1) translateY(-30px); }
+    50%{ transform: scale(1.05,.95) translateY(0px); }
+    57%{ transform: scale(1,1) translateY(-8px); }
+    64%{ transform: scale(1,1) translateY(0px); }
+    100%{ transform: scale(1,1) translateY(0px); }
+    }
+
+
