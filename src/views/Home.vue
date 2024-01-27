@@ -9,15 +9,29 @@
 
           <div class="card-body bg-pokebola bg-normal">
             <div class="pokemon">
-              <transition name="pulo" :duration="{enter:2000, leave:1000}">
-                <img src="../assets/imgs/pokemons/001.png" v-if="exibir">
-              </transition>
-              <div class="evolucoes">
-                <transition name="fade">
-                  <img src="../assets/imgs/pokemons/003.png" v-if="exibir">
+              <!--  <transition name="pulo" :duration="{enter:2000, leave:1000}">
+                  <img src="../assets/imgs/pokemons/001.png" v-if="exibir">
                 </transition>
-                <transition name="fade">
-                  <img src="../assets/imgs/pokemons/002.png" v-if="exibir">
+                -->
+              <transition
+
+                  @before-enter="antesDaEntrada"
+                  @enter="duranteAEntrada"
+                  @after-enter="exibirEvolucoesTransicao"
+                  @before-leave="ocutarEvolucoesTransicao"
+
+                  enter-active-class="animate__animated animate__bounceIn"
+                  leave-active-class="animate__animated animate__backOutUp"
+              >
+                <img :src="require(`@/assets/imgs/pokemons/${pokemon.imagem}`)" v-if="exibir">
+              </transition>
+
+              <div class="evolucoes">
+                <transition name="fade" v-for="e in pokemon.evolucoes" :key="e">
+                  <img :src="require(`../assets/imgs/pokemons/${e.toString().padStart(3, '0')}.png`)"
+                       v-if="exibirEvolucoes">
+
+                  <!-- <img src="../assets/imgs/pokemons/003.png" v-if="exibirEvolucoes">-->
                 </transition>
 
               </div>
@@ -27,11 +41,30 @@
           <div class="card-footer">
 
             <nav class="nav nav-pills nav-fill">
-              <!-- menu de navegação -->
+              <router-link
+                  class="nav-link nav-item text-white"
+                  :to="{path: '/sobre' }"
+                  exact-active-class="active"
+              >
+                Sobre
+              </router-link>
+              <router-link class="nav-link nav-item text-white" :to="{path: '/status' }" exact-active-class="active">
+                status
+              </router-link>
+              <router-link class="nav-link nav-item text-white" :to="{path: '/habilidades' }"
+                           exact-active-class="active">habilidades
+              </router-link>
+
             </nav>
 
             <div class="detalhes">
-              <!-- exibe dados de acordo com o menu de navegação -->
+              <router-view v-slot="{ Component }">
+                <transition
+                    enter-active-class="animate__animated animate__zoomInDown"
+                >
+                  <component :is="Component"/>
+                </transition>
+              </router-view>
             </div>
 
           </div>
@@ -65,11 +98,13 @@
           <div class="pokedex-catalogo">
 
             <!-- início listagem dinâmica -->
-            <div class="cartao-pokemon bg-grama" @click="exibir = !exibir">
-              <h1>1 Bulbasaur</h1>
-              <span>grama</span>
+            <div v-for="p in pokemons" :key="p.id"
+                 :class="`cartao-pokemon bg-${p.tipo}`"
+                 @click="analisarPokemon(p)">
+              <h1>{{ p.id }} {{ p.nome }}</h1>
+              <span>{{ p.tipo }}</span>
               <div class="cartao-pokemon-img">
-                <img src="../assets/imgs/pokemons/001.png">
+                <img :src="require(`../assets/imgs/pokemons/${p.imagem}`)">
               </div>
             </div>
             <!-- fim listagem dinâmica -->
@@ -87,8 +122,62 @@
 export default {
   name: 'Home',
   data: () => ({
-    exibir: false
-  })
+    exibir: false,
+    exibirEvolucoes: false,
+   /* pokemons: [
+      {id: 1, nome: 'Bulbasaur', tipo: 'grama', imagem: '001.png', evolucoes: [2, 3]},
+      {id: 2, nome: 'Ivysaur', tipo: 'grama', imagem: '002.png', evolucoes: [3]},
+      {id: 3, nome: 'Venusaur', tipo: 'grama', imagem: '003.png', evolucoes: []},
+      {id: 4, nome: 'Charmander', tipo: 'fogo', imagem: '004.png', evolucoes: [5, 6]},
+      {id: 5, nome: 'Charmeleon', tipo: 'fogo', imagem: '005.png', evolucoes: [6]},
+      {id: 6, nome: 'Charizard', tipo: 'fogo', imagem: '006.png', evolucoes: []},
+      {id: 7, nome: 'Squirtle', tipo: 'agua', imagem: '007.png', evolucoes: [8, 9]},
+      {id: 8, nome: 'Wartortle', tipo: 'agua', imagem: '008.png', evolucoes: [9]},
+      {id: 9, nome: 'Blastoise', tipo: 'agua', imagem: '009.png', evolucoes: []},
+      {id: 10, nome: 'Caterpie', tipo: 'inseto', imagem: '010.png', evolucoes: [11, 12]},
+      {id: 11, nome: 'Metapod', tipo: 'inseto', imagem: '011.png', evolucoes: [12]},
+      {id: 12, nome: 'Butterfree', tipo: 'inseto', imagem: '012.png', evolucoes: []},
+      {id: 13, nome: 'Weedle', tipo: 'inseto', imagem: '013.png', evolucoes: [14, 15]},
+      {id: 14, nome: 'Kakuna', tipo: 'inseto', imagem: '014.png', evolucoes: [15]},
+      {id: 15, nome: 'Beedrill', tipo: 'inseto', imagem: '015.png', evolucoes: []},
+      {id: 16, nome: 'Pidgey', tipo: 'normal', imagem: '016.png', evolucoes: [17, 18]},
+      {id: 17, nome: 'Pidgeotto', tipo: 'normal', imagem: '017.png', evolucoes: [18]},
+      {id: 18, nome: 'Pidgeot', tipo: 'normal', imagem: '018.png', evolucoes: []}
+    ]*/
+    pokemons: [],
+    pokemon: {}
+  }),
+  created() {
+    fetch('http://localhost:3000/pokemons')
+        .then(response => {
+          return response.json()
+        })
+        .then(data => {
+          this.pokemons = data
+        })
+
+        },
+
+
+  methods: {
+    exibirEvolucoesTransicao() {
+      this.exibirEvolucoes = true;
+    },
+    ocutarEvolucoesTransicao() {
+      this.exibirEvolucoes = false;
+    },
+    analisarPokemon(p) {
+
+      if (this.pokemon.id != p.id && this.exibir) {
+        setTimeout(() => {
+          this.analisarPokemon(p) // recursividade
+        }, 1000);
+      }
+      this.pokemon = p;
+      this.exibir = !this.exibir
+      this.exibirEvolucoes = !this.exibirEvolucoes
+    }
+  }
 }
 </script>
 
@@ -212,7 +301,6 @@ body {
   cursor: pointer;
   max-width: 100%;
   max-height: 100%;
-  float: right;
 }
 
 
