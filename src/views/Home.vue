@@ -58,7 +58,11 @@
             </nav>
 
             <div class="detalhes">
-              <router-view v-slot="{ Component }">
+              <router-view v-slot="{ Component }"
+                           :pokemon="pokemon"
+                           @adicionarHabilidade="adicionarHabilidade"
+                           @removerHabilidade="removerHabilidade"
+              >
                 <transition
                     enter-active-class="animate__animated animate__zoomInDown"
                 >
@@ -82,10 +86,13 @@
 
         <div class="row">
           <div class="col">
-            <select class="form-select">
-              <option>Id crescente</option>
-              <option>Id decrescrente</option>
-              <option>De A - Z</option>
+            <select class="form-select" v-model="ordenacao">
+              <option disabled>Ordenar por</option>
+              <option value="1">Id crescente</option>
+              <option value="2">Id decrescrente</option>
+              <option value="3">De A - Z</option>
+              <option value="4">De z - A (localeCompare)</option>
+
             </select>
           </div>
 
@@ -98,15 +105,23 @@
           <div class="pokedex-catalogo">
 
             <!-- início listagem dinâmica -->
-            <div v-for="p in pokemons" :key="p.id"
+            <transition-group name="ordenacao">
+            <div
+                v-for="p in pokemons" :key="p.id"
                  :class="`cartao-pokemon bg-${p.tipo}`"
                  @click="analisarPokemon(p)">
               <h1>{{ p.id }} {{ p.nome }}</h1>
               <span>{{ p.tipo }}</span>
               <div class="cartao-pokemon-img">
-                <img :src="require(`../assets/imgs/pokemons/${p.imagem}`)">
+                <transition
+                    appear
+                    enter-active-class="animate__animated animate__fadeInDown"
+                >
+                  <img :src="require(`../assets/imgs/pokemons/${p.imagem}`)">
+                </transition>
               </div>
             </div>
+            </transition-group>
             <!-- fim listagem dinâmica -->
 
           </div>
@@ -145,9 +160,319 @@ export default {
       {id: 18, nome: 'Pidgeot', tipo: 'normal', imagem: '018.png', evolucoes: []}
     ]*/
     pokemons: [],
-    pokemon: {}
+    pokemon: {},
+    ordenacao: ''
   }),
+  watch: {
+    ordenacao(valorNovo) {
+      console.log('ordenacao', valorNovo)
+      if (valorNovo === '1') { //ordernação por id crescente
+        this.pokemons.sort((proximo, atual) => {
+          if (atual.id > proximo.id) {
+            return -1
+          }
+          if (atual.id < proximo.id) {
+            return 1
+          }
+          return 0
+
+        })
+      }
+      if (valorNovo === '2') { //ordernação por id decrescente
+        //return 1 para indicar que o primeiro elemento é maior
+        //return -1 para indicar que o segundo elemento é maior
+        //return 0 para indicar que os elementos são iguais
+
+        this.pokemons.sort((proximo, atual) => {
+          if (atual.id > proximo.id) {
+            return 1
+          }
+          if (atual.id < proximo.id) {
+            return -1
+          }
+          return 0
+
+        })
+      }
+      if (valorNovo == 3) {
+        this.pokemons.sort((proximo, atual) => {
+          if (atual.nome < proximo.nome) {
+            return 1
+          }
+          if (atual.nome > proximo.nome) {
+            return -1
+          }
+          return 0
+
+        })
+
+      }
+      if (valorNovo == 4) {
+        this.pokemons.sort((proximo, atual) => {// ordernação alfabetica de z a A
+          return atual.nome.localeCompare(proximo.nome)
+        })
+      }
+
+    }
+
+  },
   created() {
+    this.pokemons = [
+      {
+        "id": 1,
+        "nome": "Bulbasaur",
+        "tipo": "grama",
+        "imagem": "001.png",
+        "evolucoes": [2,3],
+        "habilidades": ["Ataque fúria", "Esquivar"],
+        "status": {
+          "forca": 30,
+          "agilidade": 40,
+          "ataque": 20,
+          "defesa": 25
+        }
+      },
+      {
+        "id": 2,
+        "nome": "Ivysaur",
+        "tipo": "grama",
+        "imagem": "002.png",
+        "evolucoes": [3],
+        "habilidades": ["Ataque fúria", "Esquivar"],
+        "status": {
+          "forca": 30,
+          "agilidade": 40,
+          "ataque": 20,
+          "defesa": 25
+        }
+      },
+      {
+        "id": 3,
+        "nome": "Venusaur",
+        "tipo": "grama",
+        "imagem": "003.png",
+        "evolucoes": [],
+        "habilidades": ["Ataque fúria", "Esquivar"],
+        "status": {
+          "forca": 30,
+          "agilidade": 40,
+          "ataque": 20,
+          "defesa": 25
+        }
+      },
+      {
+        "id": 4,
+        "nome": "Charmander",
+        "tipo": "fogo",
+        "imagem": "004.png",
+        "evolucoes": [5, 6],
+        "habilidades": ["Ataque fúria", "Esquivar"],
+        "status": {
+          "forca": 40,
+          "agilidade": 40,
+          "ataque": 20,
+          "defesa": 25
+        }
+      },
+      {
+        "id": 5,
+        "nome": "Charmeleon",
+        "tipo": "fogo",
+        "imagem": "005.png",
+        "evolucoes": [6],
+        "habilidades": ["Ataque fúria", "Esquivar"],
+        "status": {
+          "forca": 30,
+          "agilidade": 40,
+          "ataque": 20,
+          "defesa": 25
+        }
+      },
+      {
+        "id": 6,
+        "nome": "Charizard",
+        "tipo": "fogo",
+        "imagem": "006.png",
+        "evolucoes": [],
+        "habilidades": ["Ataque fúria", "Esquivar"],
+        "status": {
+          "forca": 30,
+          "agilidade": 40,
+          "ataque": 20,
+          "defesa": 25
+        }
+      },
+      {
+        "id": 7,
+        "nome": "Squirtle",
+        "tipo": "agua",
+        "imagem": "007.png",
+        "evolucoes": [8,9],
+        "habilidades": ["Jato de água", "mergulho", "cabeçada"],
+        "status": {
+          "forca": 30,
+          "agilidade": 40,
+          "ataque": 20,
+          "defesa": 25
+        }
+      },
+      {
+        "id": 8,
+        "nome": "Wartortle",
+        "tipo": "agua",
+        "imagem": "008.png",
+        "evolucoes": [9],
+        "habilidades": ["Ataque fúria", "Esquivar"],
+        "status": {
+          "forca": 30,
+          "agilidade": 40,
+          "ataque": 20,
+          "defesa": 25
+        }
+      },
+      {
+        "id": 9,
+        "nome": "Blastoise",
+        "tipo": "agua",
+        "imagem": "009.png",
+        "evolucoes": [],
+        "habilidades": ["Ataque fúria", "Esquivar"],
+        "status": {
+          "forca": 30,
+          "agilidade": 40,
+          "ataque": 20,
+          "defesa": 25
+        }
+      },
+      {
+        "id": 10,
+        "nome": "Caterpie",
+        "tipo": "inseto",
+        "imagem": "010.png",
+        "evolucoes": [11,12],
+        "habilidades": ["Ataque fúria", "Esquivar"],
+        "status": {
+          "forca": 30,
+          "agilidade": 40,
+          "ataque": 20,
+          "defesa": 25
+        }
+      },
+      {
+        "id": 11,
+        "nome": "Metapod",
+        "tipo": "inseto",
+        "imagem": "011.png",
+        "evolucoes": [12],
+        "habilidades": ["Ataque fúria", "Esquivar"],
+        "status": {
+          "forca": 30,
+          "agilidade": 40,
+          "ataque": 20,
+          "defesa": 25
+        }
+      },
+      {
+        "id": 12,
+        "nome": "Butterfree",
+        "tipo": "inseto",
+        "imagem": "012.png",
+        "evolucoes": [],
+        "habilidades": ["Ataque fúria", "Esquivar"],
+        "status": {
+          "forca": 30,
+          "agilidade": 40,
+          "ataque": 20,
+          "defesa": 25
+        }
+      },
+      {
+        "id": 13,
+        "nome": "Weedle",
+        "tipo": "inseto",
+        "imagem": "013.png",
+        "evolucoes": [14,15],
+        "habilidades": ["Ataque fúria", "Esquivar"],
+        "status": {
+          "forca": 30,
+          "agilidade": 40,
+          "ataque": 20,
+          "defesa": 25
+        }
+      },
+      {
+        "id": 14,
+        "nome": "Kakuna",
+        "tipo": "inseto",
+        "imagem": "014.png",
+        "evolucoes": [15],
+        "habilidades": ["Ataque fúria", "Esquivar"],
+        "status": {
+          "forca": 30,
+          "agilidade": 40,
+          "ataque": 20,
+          "defesa": 25
+        }
+      },
+      {
+        "id": 15,
+        "nome": "Beedrill",
+        "tipo": "inseto",
+        "imagem": "015.png",
+        "evolucoes": [],
+        "habilidades": ["Ataque fúria", "Esquivar"],
+        "status": {
+          "forca": 30,
+          "agilidade": 40,
+          "ataque": 20,
+          "defesa": 25
+        }
+      },
+      {
+        "id": 16,
+        "nome": "Pidgey",
+        "tipo": "normal",
+        "imagem": "016.png",
+        "evolucoes": [17,18],
+        "habilidades": ["Ataque fúria", "Esquivar"],
+        "status": {
+          "forca": 30,
+          "agilidade": 40,
+          "ataque": 20,
+          "defesa": 25
+        }
+      },
+      {
+        "id": 17,
+        "nome": "Pidgeotto",
+        "tipo": "normal",
+        "imagem": "017.png",
+        "evolucoes": [18],
+        "habilidades": ["Ataque fúria", "Esquivar"],
+        "status": {
+          "forca": 30,
+          "agilidade": 40,
+          "ataque": 20,
+          "defesa": 25
+        }
+      },
+      {
+        "id": 18,
+        "nome": "Pidgeot",
+        "tipo": "normal",
+        "imagem": "018.png",
+        "evolucoes": [],
+        "habilidades": ["Ataque fúria", "Esquivar"],
+        "status": {
+          "forca": 30,
+          "agilidade": 40,
+          "ataque": 20,
+          "defesa": 25
+        }
+      }
+    ]
+  },
+  /*created() {
     fetch('http://localhost:3000/pokemons')
         .then(response => {
           return response.json()
@@ -156,7 +481,7 @@ export default {
           this.pokemons = data
         })
 
-        },
+        },*/
 
 
   methods: {
@@ -168,15 +493,35 @@ export default {
     },
     analisarPokemon(p) {
 
+      let mudaPokemonAnalisado = false
+
       if (this.pokemon.id != p.id && this.exibir) {
         setTimeout(() => {
           this.analisarPokemon(p) // recursividade
         }, 1000);
+        mudaPokemonAnalisado = true
       }
       this.pokemon = p;
       this.exibir = !this.exibir
       this.exibirEvolucoes = !this.exibirEvolucoes
-    }
+
+      if (!this.exibir && !mudaPokemonAnalisado) {
+        this.pokemon = {}
+      }
+    },
+    adicionarHabilidade(habilidade) {
+      if (!this.pokemon.habilidades) {
+        this.pokemon.habilidades = []
+      }
+      this.pokemon.habilidades.push(habilidade)
+    },
+    removerHabilidade(indice) {
+      if (this.pokemon.habilidades[indice]) {
+        // console.log('remover habilidade', indice)
+        this.pokemon.habilidades.splice(indice, 1)
+      }
+    },
+
   }
 }
 </script>

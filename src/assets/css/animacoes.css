@@ -166,4 +166,41 @@
     transition: all 1s;
 }
 
+/*transition-group lista que terá um efeito de slide*/
+.lista-enter-from {
+    opacity: 0;
+    transform: translateX(-150px);
+
+}
+
+.lista-enter-active {
+    transition: all 1s;
+}
+
+
+.lista-leave-active {
+    transition: all 1s;
+    position: absolute;
+}
+.lista-enter-to, .lista-leave-from {
+    opacity: 1;
+    transform: translateX(0px);
+}
+
+.lista-leave-to {
+    opacity: 1;
+    transform: translateX(150px);
+}
+
+.lista-move{
+    transition: 1s;
+}
+
+/*ordernacao transiction-group para o filtro de ordernaçaõ*/
+
+.ordenacao-move{
+    transition: all 2s;
+
+}
+
 
